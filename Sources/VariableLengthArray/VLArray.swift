@@ -234,6 +234,7 @@ extension VLArray where Element == UInt8 {
 }
 
 // MARK: Join
+#if compiler(>=6.2)
 extension VLArray {
     @inlinable
     public func join<let count: Int, E: Error>(
@@ -256,3 +257,4 @@ extension VLArray {
         }
     }
 }
+#endif

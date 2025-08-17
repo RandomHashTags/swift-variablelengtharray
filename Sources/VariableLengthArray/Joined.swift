@@ -1,4 +1,6 @@
 
+#if compiler(>=6.2)
+
 extension VLArray {
     public struct Joined: ~Copyable, @unchecked Sendable {
         public typealias Index = Int
@@ -124,3 +126,5 @@ extension VLArray {
         //}
     }
 }
+
+#endif
