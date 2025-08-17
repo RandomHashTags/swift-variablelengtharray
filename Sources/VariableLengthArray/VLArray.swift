@@ -71,7 +71,11 @@ extension VLArray where Element: ~Copyable {
     ///     // c == MyFancyCollection([2, 4, 6, 8, 10])
     @inlinable
     public var indices: Range<Index> {
+        #if compiler(>=6.2)
         _storage.indices
+        #else
+        startIndex..<endIndex
+        #endif
     }
 
     /// Returns the position immediately after the given index.
