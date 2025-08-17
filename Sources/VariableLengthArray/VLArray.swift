@@ -112,6 +112,7 @@ public struct VLArray<Element>: ~Copyable, @unchecked Sendable where Element: ~C
 }
 
 // MARK: Subscript
+// copyable
 extension VLArray {
     /// Accesses the element at the specified position.
     ///
@@ -144,6 +145,8 @@ extension VLArray {
         set { _storage[i] = newValue }
     }
 }
+
+// noncopyable
 extension VLArray where Element: ~Copyable {
     /// Accesses the element at the specified position.
     ///
@@ -178,6 +181,7 @@ extension VLArray where Element: ~Copyable {
 }
 
 // MARK: Create
+// copyable
 extension VLArray {
     @inlinable
     public static func create<E: Error>(
@@ -213,6 +217,29 @@ extension VLArray {
         })
     }
 }
+
+// noncopyable
+extension VLArray where Element: ~Copyable {
+    @inlinable
+    public static func create<E: Error>(
+        amount: Int,
+        initialize: (Index) -> Element,
+        _ closure: (consuming Self) throws(E) -> Void
+    ) rethrows {
+        try withUnsafeTemporaryAllocation(of: Element.self, capacity: amount, { p in
+            for i in 0..<amount {
+                p[i] = initialize(i)
+            }
+            defer {
+                p.deinitialize()
+            }
+            let array = Self(_storage: p)
+            try closure(array)
+        })
+    }
+}
+
+// other
 extension VLArray where Element == UInt8 {
 
     @inlinable
