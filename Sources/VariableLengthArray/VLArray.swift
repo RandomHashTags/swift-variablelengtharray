@@ -183,29 +183,31 @@ extension VLArray where Element: ~Copyable {
 // MARK: Create
 // copyable
 extension VLArray {
+    @discardableResult
     @inlinable
-    public static func create<E: Error>(
+    public static func create<E: Error, T>(
         amount: Int,
         default: Element,
-        _ closure: (consuming Self) throws(E) -> Void
-    ) rethrows {
-        try withUnsafeTemporaryAllocation(of: Element.self, capacity: amount, { p in
+        _ closure: (consuming Self) throws(E) -> T
+    ) rethrows -> T {
+        return try withUnsafeTemporaryAllocation(of: Element.self, capacity: amount, { p in
             p.initialize(repeating: `default`)
             defer {
                 p.deinitialize()
             }
             let array = Self(_storage: p)
-            try closure(array)
+            return try closure(array)
         })
     }
 
+    @discardableResult
     @inlinable
-    public static func create<E: Error>(
+    public static func create<E: Error, T>(
         amount: Int,
         initialize: (Index) -> Element,
-        _ closure: (consuming Self) throws(E) -> Void
-    ) rethrows {
-        try withUnsafeTemporaryAllocation(of: Element.self, capacity: amount, { p in
+        _ closure: (consuming Self) throws(E) -> T
+    ) rethrows -> T {
+        return try withUnsafeTemporaryAllocation(of: Element.self, capacity: amount, { p in
             for i in 0..<amount {
                 p[i] = initialize(i)
             }
@@ -213,20 +215,21 @@ extension VLArray {
                 p.deinitialize()
             }
             let array = Self(_storage: p)
-            try closure(array)
+            return try closure(array)
         })
     }
 }
 
 // noncopyable
 extension VLArray where Element: ~Copyable {
+    @discardableResult
     @inlinable
-    public static func create<E: Error>(
+    public static func create<E: Error, T>(
         amount: Int,
         initialize: (Index) -> Element,
-        _ closure: (consuming Self) throws(E) -> Void
-    ) rethrows {
-        try withUnsafeTemporaryAllocation(of: Element.self, capacity: amount, { p in
+        _ closure: (consuming Self) throws(E) -> T
+    ) rethrows -> T {
+        return try withUnsafeTemporaryAllocation(of: Element.self, capacity: amount, { p in
             for i in 0..<amount {
                 p[i] = initialize(i)
             }
@@ -234,7 +237,7 @@ extension VLArray where Element: ~Copyable {
                 p.deinitialize()
             }
             let array = Self(_storage: p)
-            try closure(array)
+            return try closure(array)
         })
     }
 }
@@ -242,12 +245,13 @@ extension VLArray where Element: ~Copyable {
 // other
 extension VLArray where Element == UInt8 {
 
+    @discardableResult
     @inlinable
-    public static func create<E: Error>(
+    public static func create<E: Error, T>(
         string: StaticString,
-        _ closure: (consuming Self) throws(E) -> Void
-    ) rethrows {
-        try withUnsafeTemporaryAllocation(of: Element.self, capacity: string.utf8CodeUnitCount, { p in
+        _ closure: (consuming Self) throws(E) -> T
+    ) rethrows -> T {
+        return try withUnsafeTemporaryAllocation(of: Element.self, capacity: string.utf8CodeUnitCount, { p in
             string.withUTF8Buffer {
                 p.initialize(fromContentsOf: $0)
             }
@@ -255,33 +259,35 @@ extension VLArray where Element == UInt8 {
                 p.deinitialize()
             }
             let array = Self(_storage: p)
-            try closure(array)
+            return try closure(array)
         })
     }
 
+    @discardableResult
     @inlinable
-    public static func create<E: Error>(
+    public static func create<E: Error, T>(
         string: some StringProtocol,
-        _ closure: (consuming Self) throws(E) -> Void
-    ) rethrows {
+        _ closure: (consuming Self) throws(E) -> T
+    ) rethrows -> T {
         let utf8 = string.utf8
-        try withUnsafeTemporaryAllocation(of: Element.self, capacity: utf8.count, { p in
+        return try withUnsafeTemporaryAllocation(of: Element.self, capacity: utf8.count, { p in
             let endIndexPlusOne = p.initialize(fromContentsOf: utf8)
             defer {
                 p.deinitialize()
             }
             let array = Self(_storage: p)
-            try closure(array)
+            return try closure(array)
         })
     }
 
+    @discardableResult
     @inlinable
-    public static func create<E: Error>(
+    public static func create<E: Error, T>(
         collection: some Collection<UInt8>,
-        _ closure: (consuming Self) throws(E) -> Void
-    ) rethrows {
+        _ closure: (consuming Self) throws(E) -> T
+    ) rethrows -> T {
         let count = collection.count
-        try withUnsafeTemporaryAllocation(
+        return try withUnsafeTemporaryAllocation(
             of: Element.self,
             capacity: count
         ) { p in
@@ -290,7 +296,7 @@ extension VLArray where Element == UInt8 {
                 p.deinitialize()
             }
             let array = Self(_storage: p)
-            try closure(array)
+            return try closure(array)
         }
     }
 }
