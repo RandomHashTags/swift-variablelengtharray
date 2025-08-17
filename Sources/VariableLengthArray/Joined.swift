@@ -13,9 +13,9 @@ extension VLArray {
         }
 
         @inlinable
-        public static func create<E: Error, let count: Int>(
+        public static func create<let count: Int>(
             _ elements: borrowing InlineArray<count, VLArray<Element>>,
-            closure: (inout Self) throws(E) -> Void
+            closure: (inout Self) throws -> Void
         ) rethrows {
             try withUnsafeTemporaryAllocation(of: UnsafeMutableBufferPointer<Element>.self, capacity: elements.count, { pointer in
                 for i in elements.indices {
@@ -110,8 +110,8 @@ extension VLArray {
         }
 
         @inlinable
-        public func forEachElement<E: Error>(
-            _ yielding: (Element) throws(E) -> Void
+        public func forEachElement(
+            _ yielding: (Element) throws -> Void
         ) rethrows {
             for i in _storage.indices {
                 let buffer = _storage[i]
