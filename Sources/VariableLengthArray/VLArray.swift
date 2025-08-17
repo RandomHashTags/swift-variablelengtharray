@@ -3,7 +3,7 @@
 /// Variable-length array, most likely stored on the stack.
 /// 
 /// - Warning: May fall back to heap allocation if the compiler/runtime decides the allocation is too big for the stack.
-public struct VLArray<Element>: ~Copyable, @unchecked Sendable {
+public struct VLArray<Element>: ~Copyable, @unchecked Sendable where Element: ~Copyable {
     public typealias Index = Int
 
     @usableFromInline
@@ -96,6 +96,23 @@ public struct VLArray<Element>: ~Copyable, @unchecked Sendable {
         _storage.index(before: i)
     }
 
+    /// Exchanges the values at the specified indices of the buffer.
+    ///
+    /// Both parameters must be valid indices of the buffer, and not
+    /// equal to `endIndex`. Passing the same index as both `i` and `j` has no
+    /// effect.
+    ///
+    /// - Parameters:
+    ///   - i: The index of the first value to swap.
+    ///   - j: The index of the second value to swap.
+    @inlinable
+    public mutating func swapAt(_ i: Index, _ j: Index) {
+        _storage.swapAt(i, j)
+    }
+}
+
+// MARK: Subscript
+extension VLArray {
     /// Accesses the element at the specified position.
     ///
     /// The following example uses the buffer pointer's subscript to access and
@@ -126,19 +143,37 @@ public struct VLArray<Element>: ~Copyable, @unchecked Sendable {
         get { _storage[i] }
         set { _storage[i] = newValue }
     }
-
-    /// Exchanges the values at the specified indices of the buffer.
+}
+extension VLArray where Element: ~Copyable {
+    /// Accesses the element at the specified position.
     ///
-    /// Both parameters must be valid indices of the buffer, and not
-    /// equal to `endIndex`. Passing the same index as both `i` and `j` has no
-    /// effect.
+    /// The following example uses the buffer pointer's subscript to access and
+    /// modify the elements of a mutable buffer pointing to the contiguous
+    /// contents of an array:
     ///
-    /// - Parameters:
-    ///   - i: The index of the first value to swap.
-    ///   - j: The index of the second value to swap.
+    ///     var numbers = [1, 2, 3, 4, 5]
+    ///     numbers.withUnsafeMutableBufferPointer { buffer in
+    ///         for i in stride(from: buffer.startIndex, to: buffer.endIndex - 1, by: 2) {
+    ///             let x = buffer[i]
+    ///             buffer[i + 1] = buffer[i]
+    ///             buffer[i] = x
+    ///         }
+    ///     }
+    ///     print(numbers)
+    ///     // Prints "[2, 1, 4, 3, 5]"
+    ///
+    /// Uninitialized memory cannot be initialized to a nontrivial type
+    /// using this subscript. Instead, use an initializing method, such as
+    /// `initializeElement(at:to:)`
+    ///
+    /// - Note: Bounds checks for `i` are performed only in debug mode.
+    ///
+    /// - Parameter i: The position of the element to access. `i` must be in the
+    ///   range `0..<count`.
     @inlinable
-    public mutating func swapAt(_ i: Index, _ j: Index) {
-        _storage.swapAt(i, j)
+    public subscript(i: Index) -> Element {
+        _read { yield _storage[i] }
+        _modify { yield &_storage[i] }
     }
 }
 
