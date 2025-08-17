@@ -46,14 +46,37 @@ struct VariableLengthArrayTests {
     }
 
     @Test
-    func clArrayNonCopyable() {
+    func vlArrayNonCopyable() {
         let amount = 1
-        VLArray<Noncopyable>.create(amount: amount, initialize: ({ .init(bro: $0) }), { array in
+        VLArray<TestNonCopyable>.create(amount: amount, initialize: ({ .init(bro: $0) }), { array in
             #expect(array.count == amount)
             for i in array.indices {
                 #expect(i == array[i].bro)
             }
         })
+    }
+
+    @Test
+    func vlArrayContains() {
+        var amount = 3
+        VLArray<TestCopyable>.create(amount: amount, initialize: ({ .init(bro: $0) })) { array in
+            for i in 0..<amount {
+                let contained = array.contains(where: { $0.bro == i })
+                #expect(contained)
+            }
+            amount += 1
+            let contained = array.contains(where: { $0.bro == amount })
+            #expect(!contained)
+        }
+        VLArray<TestNonCopyable>.create(amount: amount, initialize: ({ .init(bro: $0) })) { array in
+            for i in 0..<amount {
+                let contained = array.contains(where: { $0.bro == i })
+                #expect(contained)
+            }
+            amount += 1
+            let contained = array.contains(where: { $0.bro == amount })
+            #expect(!contained)
+        }
     }
 
     @Test
@@ -76,6 +99,10 @@ struct VariableLengthArrayTests {
     }
 }
 
-struct Noncopyable: ~Copyable {
+struct TestCopyable {
+    let bro:Int
+}
+
+struct TestNonCopyable: ~Copyable {
     let bro:Int
 }
