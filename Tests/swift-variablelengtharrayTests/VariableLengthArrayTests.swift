@@ -5,7 +5,7 @@ import Testing
 @Suite
 struct VariableLengthArrayTests {
     @Test
-    func vlArray() {
+    func vlArrayCopyable() {
         VLArray<UInt8>.create(amount: 5, default: 0, { array in
             #expect(array.count == 5)
             for i in array.indices {
@@ -46,6 +46,17 @@ struct VariableLengthArrayTests {
     }
 
     @Test
+    func clArrayNonCopyable() {
+        let amount = 1
+        VLArray<Noncopyable>.create(amount: amount, initialize: ({ .init(bro: $0) }), { array in
+            #expect(array.count == amount)
+            for i in array.indices {
+                #expect(i == array[i].bro)
+            }
+        })
+    }
+
+    @Test
     func joinedVLArrayVL() {
         VLArray<UInt8>.create(amount: 5, default: 0) { first in
             VLArray<UInt8>.create(amount: 6, default: 1) { second in
@@ -63,4 +74,8 @@ struct VariableLengthArrayTests {
             }
         }
     }
+}
+
+struct Noncopyable: ~Copyable {
+    let bro:Int
 }

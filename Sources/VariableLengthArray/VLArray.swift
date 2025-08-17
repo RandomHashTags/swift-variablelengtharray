@@ -13,7 +13,9 @@ public struct VLArray<Element>: ~Copyable, @unchecked Sendable where Element: ~C
     public init(_storage: UnsafeMutableBufferPointer<Element>) {
         self._storage = _storage
     }
+}
 
+extension VLArray where Element: ~Copyable {
     /// The index of the first element in a nonempty buffer.
     ///
     /// The `startIndex` property of an `VLArray` instance
