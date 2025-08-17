@@ -6,7 +6,7 @@ let package = Package(
     name: "swift-variablelengtharray",
     products: [
         .library(
-            name: "swift-variablelengtharray",
+            name: "VariableLengthArray",
             targets: ["VariableLengthArray"]
         )
     ],
