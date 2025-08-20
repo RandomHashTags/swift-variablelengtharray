@@ -2,6 +2,29 @@
 #if compiler(>=6.2)
 
 extension VLArray {
+    @inlinable
+    public func join<let count: Int>(
+        _ arrays: consuming InlineArray<count, VLArray>,
+        _ body: (inout Joined) throws -> Void
+    ) rethrows {
+        try withUnsafeTemporaryAllocation(
+            of: UnsafeMutableBufferPointer<Element>.self,
+            capacity: 1 + count
+        ) { p in
+            p.initializeElement(at: 0, to: self._storage)
+            for i in arrays.indices {
+                p.initializeElement(at: 1 + i, to: arrays[i]._storage)
+            }
+            defer {
+                p.deinitialize()
+            }
+            var joined = Joined.init(_storage: p)
+            try body(&joined)
+        }
+    }
+}
+
+extension VLArray {
     public struct Joined: ~Copyable, @unchecked Sendable {
         public typealias Index = Int
 

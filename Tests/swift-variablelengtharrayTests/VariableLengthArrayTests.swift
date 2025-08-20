@@ -53,6 +53,7 @@ struct VariableLengthArrayTests {
             for i in array.indices {
                 #expect(i == array[i].bro)
             }
+            return TestNonCopyable(bro: 0)
         })
     }
 
@@ -67,6 +68,7 @@ struct VariableLengthArrayTests {
             amount += 1
             let contained = array.contains(where: { $0.bro == amount })
             #expect(!contained)
+            return TestCopyable(bro: 0)
         }
         VLArray<TestNonCopyable>.create(amount: amount, initialize: ({ .init(bro: $0) })) { array in
             for i in 0..<amount {
@@ -79,6 +81,7 @@ struct VariableLengthArrayTests {
         }
     }
 
+    #if compiler(>=6.2)
     @Test
     func joinedVLArrayVL() {
         VLArray<UInt8>.create(amount: 5, default: 0) { first in
@@ -97,6 +100,7 @@ struct VariableLengthArrayTests {
             }
         }
     }
+    #endif
 }
 
 struct TestCopyable {
