@@ -4,6 +4,7 @@
 /// 
 /// - Warning: May fall back to heap allocation if the compiler/runtime decides the allocation is too big for the stack.
 public struct VLArray<Element>: ~Copyable, @unchecked Sendable where Element: ~Copyable {
+    public typealias Element = Element
     public typealias Index = Int
 
     @usableFromInline

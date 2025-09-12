@@ -81,6 +81,11 @@ struct VariableLengthArrayTests {
         }
     }
 
+    func vlArrayElementTypealias(
+        element: VLArrayTypeAlias.Element
+    ) {
+    }
+
     #if compiler(>=6.2)
     @Test
     func joinedVLArrayVL() {
@@ -110,3 +115,5 @@ struct TestCopyable {
 struct TestNonCopyable: ~Copyable {
     let bro:Int
 }
+
+typealias VLArrayTypeAlias = VLArray<UInt8>
