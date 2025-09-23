@@ -1,4 +1,4 @@
-// swift-tools-version:6.0
+// swift-tools-version:6.1
 
 import PackageDescription
 
@@ -8,6 +8,13 @@ let package = Package(
         .library(
             name: "VariableLengthArray",
             targets: ["VariableLengthArray"]
+        )
+    ],
+    traits: [
+        .default(enabledTraits: ["Join"]),
+        .trait(
+            name: "Join",
+            description: "Enables functionality to join Variable Length Arrays."
         )
     ],
     targets: [

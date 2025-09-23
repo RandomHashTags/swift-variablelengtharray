@@ -1,5 +1,5 @@
 
-#if compiler(>=6.2)
+#if Join && compiler(>=6.2)
 
 extension VLArray {
     @inlinable

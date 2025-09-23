@@ -86,7 +86,7 @@ struct VariableLengthArrayTests {
     ) {
     }
 
-    #if compiler(>=6.2)
+    #if Join && compiler(>=6.2)
     @Test
     func joinedVLArrayVL() {
         VLArray<UInt8>.create(amount: 5, default: 0) { first in
